@@ -1,6 +1,6 @@
 # Advanced Geospatial - Lab 6: Line Simplification
 
-This project is part of Lab 6 for the Advanced Geospatial course. It focuses on simplifying polylines using Turf.js, and visualizing everything interactively on a Leaflet map.
+This assignment focuses on simplifying polylines using Turf.js, and visualizing everything interactively on a Leaflet map.
 
 ---
 
