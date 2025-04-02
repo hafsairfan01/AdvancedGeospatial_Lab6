@@ -1,10 +1,10 @@
-# Advanced Geospatial - Lab 6: Line Simplification
+# Advanced Geospatial - Lab 6
 
 This assignment focuses on simplifying polylines using Turf.js, and visualizing everything interactively on a Leaflet map.
 
 ---
 
-## 🧭 What It Does
+## What It Does
 
 - Lets users draw a polyline on a map centered over Calgary
 - Simplifies the drawn line using Turf.js
@@ -21,7 +21,7 @@ This assignment focuses on simplifying polylines using Turf.js, and visualizing 
 
 ---
 
-## 💡 Why I Chose Leaflet
+## Why I Chose Leaflet
 
 The assignment gave us the freedom to pick any mapping library. I chose Leaflet because:
 - It's lightweight and easy to work with
@@ -30,7 +30,7 @@ The assignment gave us the freedom to pick any mapping library. I chose Leaflet 
 
 ---
 
-## 🚀 How to Try It
+## How to Try It
 
 1. Download or clone this repo
 2. Open the `index.html` file in your browser
@@ -40,7 +40,7 @@ The assignment gave us the freedom to pick any mapping library. I chose Leaflet 
 
 ---
 
-## 🔍 References
+## References
 
 - [Leaflet Documentation](https://leafletjs.com/)
 - [Turf.js Documentation](https://turfjs.org/)
