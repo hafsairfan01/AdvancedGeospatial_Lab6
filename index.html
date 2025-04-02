@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Draw Polyline on Calgary Map</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <!-- Leaflet Draw CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-draw/dist/leaflet.draw.css" />
+
+  <style>
+    #map {
+      height: 600px;
+      width: 100%;
+    }
+    .center-heading {
+    text-align: center;
+    font-size: 28px;
+    font-weight: bold;
+    margin-top: 20px;
+    }
+
+
+  </style>
+</head>
+<body>
+
+    <h2 class="center-heading">🖊️ Draw a Polyline</h2>
+
+<div id="map"></div>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<!-- Leaflet Draw JS -->
+<script src="https://unpkg.com/leaflet-draw/dist/leaflet.draw.js"></script>
+
+<script>
+  // Step 1: Initialize the map centered on Calgary
+  const map = L.map('map').setView([51.0447, -114.0719], 12);
+
+  // Step 2: Add OpenStreetMap base layer
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+  }).addTo(map);
+
+  // Step 3: Create a feature group to store drawn layers
+  const drawnItems = new L.FeatureGroup();
+  map.addLayer(drawnItems);
+
+  // Step 4: Add drawing controls to the map (Polyline only)
+  const drawControl = new L.Control.Draw({
+    draw: {
+      polyline: true,     // Allow polylines
+      polygon: false,
+      rectangle: false,
+      circle: false,
+      marker: false,
+      circlemarker: false
+    },
+    edit: {
+      featureGroup: drawnItems
+    }
+  });
+  map.addControl(drawControl);
+
+  // Step 5: Handle draw:created event
+  map.on(L.Draw.Event.CREATED, function (event) {
+    const layer = event.layer;
+    drawnItems.addLayer(layer);
+    console.log("Polyline drawn:", layer.toGeoJSON());
+  });
+</script>
+
+</body>
+</html>
