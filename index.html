@@ -1,77 +1,97 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Draw Polyline on Calgary Map</title>
+  <title>Polyline Simplification - Calgary</title>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <!-- Leaflet Draw CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet-draw/dist/leaflet.draw.css" />
 
   <style>
-    #map {
-      height: 600px;
-      width: 100%;
-    }
-    .center-heading {
-    text-align: center;
-    font-size: 28px;
-    font-weight: bold;
-    margin-top: 20px;
-    }
-
-
+    #map { height: 600px; width: 100%; }
+    .center-heading { text-align: center; font-size: 24px; margin-top: 20px; }
+    .controls { text-align: center; margin: 15px 0; }
+    button { padding: 8px 16px; font-size: 15px; margin: 0 8px; cursor: pointer; }
+    .geojson-output { width: 90%; max-width: 800px; margin: 20px auto; }
+    pre { background: #f4f4f4; padding: 10px; overflow-x: auto; }
   </style>
 </head>
 <body>
 
-    <h2 class="center-heading">🖊️ Draw a Polyline</h2>
+  <h2 class="center-heading">🖊️ Draw and Simplify a Polyline</h2>
 
-<div id="map"></div>
+  <div class="controls">
+    <button id="simplifyBtn">Simplify Line</button>
+    <button id="clearBtn">Clear Map</button>
+  </div>
 
-<!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<!-- Leaflet Draw JS -->
-<script src="https://unpkg.com/leaflet-draw/dist/leaflet.draw.js"></script>
+  <div id="map"></div>
 
-<script>
-  // Step 1: Initialize the map centered on Calgary
-  const map = L.map('map').setView([51.0447, -114.0719], 12);
+  <div class="geojson-output">
+    <h3>Original Line (GeoJSON)</h3>
+    <pre id="originalGeoJSON"></pre>
+    <h3>Simplified Line (GeoJSON)</h3>
+    <pre id="simplifiedGeoJSON"></pre>
+  </div>
 
-  // Step 2: Add OpenStreetMap base layer
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap contributors'
-  }).addTo(map);
+  <!-- Scripts -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-draw/dist/leaflet.draw.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
 
-  // Step 3: Create a feature group to store drawn layers
-  const drawnItems = new L.FeatureGroup();
-  map.addLayer(drawnItems);
+  <script>
+    const map = L.map('map').setView([51.0447, -114.0719], 12);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
 
-  // Step 4: Add drawing controls to the map (Polyline only)
-  const drawControl = new L.Control.Draw({
-    draw: {
-      polyline: true,     // Allow polylines
-      polygon: false,
-      rectangle: false,
-      circle: false,
-      marker: false,
-      circlemarker: false
-    },
-    edit: {
-      featureGroup: drawnItems
-    }
-  });
-  map.addControl(drawControl);
+    const drawnItems = new L.FeatureGroup().addTo(map);
+    new L.Control.Draw({
+      draw: { polyline: true, polygon: false, rectangle: false, circle: false, marker: false, circlemarker: false },
+      edit: { featureGroup: drawnItems }
+    }).addTo(map);
 
-  // Step 5: Handle draw:created event
-  map.on(L.Draw.Event.CREATED, function (event) {
-    const layer = event.layer;
-    drawnItems.addLayer(layer);
-    console.log("Polyline drawn:", layer.toGeoJSON());
-  });
-</script>
+    let currentLine = null;
+    let simplifiedLine = null;
+
+    map.on('draw:created', (e) => {
+      if (currentLine) drawnItems.removeLayer(currentLine);
+      if (simplifiedLine) drawnItems.removeLayer(simplifiedLine);
+
+      currentLine = e.layer;
+      drawnItems.addLayer(currentLine);
+
+      document.getElementById("originalGeoJSON").textContent = JSON.stringify(currentLine.toGeoJSON(), null, 2);
+      document.getElementById("simplifiedGeoJSON").textContent = "";
+    });
+
+    document.getElementById("simplifyBtn").onclick = () => {
+      if (!currentLine) return alert("Please draw a line first.");
+
+      const simplified = turf.simplify(currentLine.toGeoJSON(), {
+        tolerance: 0.01, 
+        highQuality: true
+      });
+
+      if (simplifiedLine) drawnItems.removeLayer(simplifiedLine);
+
+      simplifiedLine = L.geoJSON(simplified, {
+        style: { color: 'red', weight: 3, dashArray: '5, 5' }
+      }).addTo(drawnItems);
+
+      document.getElementById("simplifiedGeoJSON").textContent = JSON.stringify(simplified, null, 2);
+    };
+
+    document.getElementById("clearBtn").onclick = () => {
+      drawnItems.clearLayers();
+      currentLine = null;
+      simplifiedLine = null;
+      document.getElementById("originalGeoJSON").textContent = "";
+      document.getElementById("simplifiedGeoJSON").textContent = "";
+    };
+  </script>
 
 </body>
 </html>
