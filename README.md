@@ -44,5 +44,4 @@ The assignment gave us the freedom to pick any mapping library. I chose Leaflet 
 
 - [Leaflet Documentation](https://leafletjs.com/)
 - [Turf.js Documentation](https://turfjs.org/)
-- [Leaflet.draw GitHub](https://github.com/Leaflet/Leaflet.draw)
 
